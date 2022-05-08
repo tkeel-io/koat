@@ -28,7 +28,7 @@ def admin_login(request):
 
 
 @pytest.fixture()
-def create_tenant(admin_login):
+def create_tenant(request, admin_login):
     '''
     创建租户
     '''
@@ -54,6 +54,8 @@ def create_tenant(admin_login):
     rq.reset_key = reset_key
     rq.tenant_id = tenant_id
 
+    request.cls.rq = rq
+    request.cls.tenant_id = tenant_id
     return rq
 
 
