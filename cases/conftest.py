@@ -60,12 +60,13 @@ def create_tenant(request, admin_login):
 
 
 @pytest.fixture()
-def tenant_reset_password(create_tenant):
+def tenant_reset_password(request,create_tenant):
     '''
     重置租户密码
     '''
     rq = create_tenant
 
+    request.cls.rq = rq
     return rq
 
 
