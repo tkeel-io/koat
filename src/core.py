@@ -15,7 +15,7 @@ class RQ(sessions.BaseUrlSession):
         self.timeout = (60, 300)
         self.base_url = base_url
 
-    def request(self, method, url, *args, **kwargs):
+    def http(self, method, url, *args, **kwargs):
         self.resp = super().request(method, url, *args, **kwargs)
         return self
 

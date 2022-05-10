@@ -4,6 +4,7 @@
 import uuid
 import pytest
 
+
 from src.core import RQ
 from cases.env import *
 
@@ -14,7 +15,7 @@ def admin_login(request):
     管理员登录
     '''
     rq = RQ(base_url=url)
-    rq.request(
+    rq.http(
         'get',
         '/apis/rudder/v1/oauth2/admin',
         params={'password': admin_password}
@@ -24,18 +25,16 @@ def admin_login(request):
     rq.set_headers(authorization=f'Bearer {access_token}')
 
     request.cls.rq = rq
-    return rq
 
 
 @pytest.fixture()
 def create_tenant(request, admin_login):
     '''
-    创建租户
+    创建租户空间
     '''
     tenant_title = str(uuid.uuid1())[0:6]
 
-    rq = admin_login
-    rq.request(
+    request.cls.rq.http(
         'post',
         '/apis/security/v1/tenants',
         json={
@@ -49,43 +48,55 @@ def create_tenant(request, admin_login):
         }
     ).expect(200)
 
-    reset_key = rq.resp.json()['data']['reset_key']
-    tenant_id = rq.resp.json()['data']['tenant_id']
-    rq.reset_key = reset_key
-    rq.tenant_id = tenant_id
+    reset_key = request.cls.rq.resp.json()['data']['reset_key']
+    tenant_id = request.cls.rq.resp.json()['data']['tenant_id']
 
-    request.cls.rq = rq
     request.cls.tenant_id = tenant_id
-    return rq
+    request.cls.reset_key = reset_key
 
 
 @pytest.fixture()
-def tenant_reset_password(request,create_tenant):
+def tenant_reset_password(request, create_tenant):
     '''
     重置租户密码
     '''
-    rq = create_tenant
+    reset_key = request.cls.reset_key
 
-    request.cls.rq = rq
-    return rq
+    request.cls.rq.http(
+        'post',
+        '/apis/security/v1/oauth/rspwd',
+        json={
+            'reset_key': reset_key,
+            'new_password': "changeme"
+        }
+
+    ).expect(200)
+
+    username = request.cls.rq.resp.json()['data']['username']
+    tenant_id = request.cls.rq.resp.json()['data']['tenant_id']
+
+    request.cls.username = username
+    request.cls.tenant_id = tenant_id
 
 
 @pytest.fixture()
-def tenant_login(request):
+def tenant_login(request, tenant_reset_password):
     '''
     租户登录
     '''
+    # tenant_user = request.cls.username
+    # tenant_id = request.cls.tenant_id
+
     rq = RQ(base_url=url)
-    rq.request(
+    rq.http(
         'get',
         f'/apis/security/v1/oauth/{tenant_id}/token',
         params={'grant_type': 'password',
                 'username': tenant_user,
-                'password': tenant_password}
+                'password': 'changeme'}
     ).expect(200)
 
     access_token = rq.resp.json()['data']['access_token']
     rq.set_headers(authorization=f'Bearer {access_token}')
 
     request.cls.rq = rq
-    return rq

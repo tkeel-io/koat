@@ -14,6 +14,12 @@ class TestTenant():
         '''
         pass
 
+    def test_tenant_reset_password(self,tenant_reset_password):
+        '''
+        重置租户密码
+        '''
+        pass
+
     @pytest.mark.run(order=1)
     def test_edit_tenant(self):
         '''
@@ -21,7 +27,7 @@ class TestTenant():
         '''
         tenant_id = self.tenant_id
         new_tenant_title = str(uuid.uuid1())[0:8]
-        self.rq.request(
+        self.rq.http(
             'put',
             f'/apis/security/v1/tenants/{tenant_id}',
             json={
@@ -36,7 +42,7 @@ class TestTenant():
         删除租户空间
         '''
         tenant_id = self.tenant_id
-        self.rq.request(
+        self.rq.http(
             'delete',
             f'/apis/security/v1/tenants/{tenant_id}',
         ).expect(200)
