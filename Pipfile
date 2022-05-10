@@ -19,4 +19,4 @@ python_version = "3.9"
 [scripts]
 test = "pytest cases -s -v"
 test-src = "pytest src/test -s"
-test-in-dev-env = "export PIPENV_DOTENV_LOCATION=`pwd`/.dev.env"
+env_example = "echo PIPENV_DOTENV_LOCATION=`pwd`/.dev.env"
