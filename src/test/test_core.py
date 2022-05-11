@@ -10,14 +10,14 @@ rq = RQ(base_url='https://yande.re')
 class TestCore():
 
     def test_request(self):
-        rq.request(
+        rq.http(
             'get',
             '/post.json',
             params={'limit': 1}
         ).expect(200)
 
     def test_core(self):
-        rq.request(
+        rq.http(
             'get',
             '/post.json',
             params={'limit': 1}
