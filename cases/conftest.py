@@ -14,6 +14,11 @@ def admin_login(request):
     '''
     管理员登录
     '''
+
+    # 在测试运行前使用 parametrize 传递参数
+    # 参考 test_tenant.py -> TestTenant
+    psw = request.param
+
     rq = RQ(base_url=url)
     rq.http(
         'get',

@@ -5,6 +5,7 @@ import uuid
 import pytest
 
 
+@pytest.mark.parametrize("admin_login", ['Y2hhbmdlbWU='], indirect=True)
 @pytest.mark.usefixtures("create_tenant")
 class TestTenant():
 
@@ -14,7 +15,7 @@ class TestTenant():
         '''
         pass
 
-    def test_tenant_reset_password(self,tenant_reset_password):
+    def test_tenant_reset_password(self, tenant_reset_password):
         '''
         重置租户密码
         '''
