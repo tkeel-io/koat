@@ -1,12 +1,12 @@
 # -*- coding: utf-8 -*-
 
 
-import uuid
 import pytest
 
 
 from src.core import RQ
 from cases.env import *
+from src.helper import random_string
 
 
 @pytest.fixture()
@@ -21,7 +21,7 @@ def admin_login(request):
         params={'password': admin_password}
     ).expect(200)
 
-    access_token = rq.resp.json()['data']['access_token']
+    access_token = rq.jq('data.access_token')
     rq.set_headers(authorization=f'Bearer {access_token}')
 
     request.cls.rq = rq
@@ -32,7 +32,7 @@ def create_tenant(request, admin_login):
     '''
     创建租户空间
     '''
-    tenant_title = str(uuid.uuid1())[0:6]
+    tenant_title = random_string()
 
     request.cls.rq.http(
         'post',
@@ -48,11 +48,8 @@ def create_tenant(request, admin_login):
         }
     ).expect(200)
 
-    reset_key = request.cls.rq.resp.json()['data']['reset_key']
-    tenant_id = request.cls.rq.resp.json()['data']['tenant_id']
-
-    request.cls.tenant_id = tenant_id
-    request.cls.reset_key = reset_key
+    request.cls.tenant_id = request.cls.rq.jq('data.tenant_id')
+    request.cls.reset_key = request.cls.rq.jq('data.reset_key')
 
 
 @pytest.fixture()
@@ -72,11 +69,8 @@ def tenant_reset_password(request, create_tenant):
 
     ).expect(200)
 
-    username = request.cls.rq.resp.json()['data']['username']
-    tenant_id = request.cls.rq.resp.json()['data']['tenant_id']
-
-    request.cls.username = username
-    request.cls.tenant_id = tenant_id
+    request.cls.username = request.cls.rq.jq('data.username')
+    request.cls.tenant_id = request.cls.rq.jq('data.tenant_id')
 
 
 @pytest.fixture()
@@ -96,7 +90,7 @@ def tenant_login(request, tenant_reset_password):
                 'password': 'changeme'}
     ).expect(200)
 
-    access_token = rq.resp.json()['data']['access_token']
+    access_token = rq.jq('data.access_token')
     rq.set_headers(authorization=f'Bearer {access_token}')
 
     request.cls.rq = rq

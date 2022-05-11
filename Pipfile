@@ -10,6 +10,7 @@ pytest = "*"
 requests-toolbelt = "*"
 pytest-sugar = "*"
 pytest-ordering = "*"
+jmespath = "==1.0.0"
 
 [dev-packages]
 

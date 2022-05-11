@@ -2,6 +2,7 @@
 
 
 from requests_toolbelt import sessions
+from .helper import search
 
 
 class RQ(sessions.BaseUrlSession):
@@ -26,3 +27,6 @@ class RQ(sessions.BaseUrlSession):
     def expect(self, status_code):
         assert self.resp.status_code == status_code
         return self
+
+    def jq(self, expr):
+        return search(expr, self.resp.json())
