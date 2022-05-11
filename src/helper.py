@@ -38,3 +38,8 @@ def search(expression, data):
 
 def random_string(end=6):
     return str(uuid.uuid1())[0:end]
+
+
+def update(payload, ojb, name='param'):
+    if hasattr(ojb, name):
+        payload.update(getattr(ojb, name))

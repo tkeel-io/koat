@@ -6,7 +6,7 @@ import pytest
 
 from src.core import RQ
 from cases.env import *
-from src.helper import random_string
+from src.helper import random_string, update
 
 
 @pytest.fixture()
@@ -14,16 +14,16 @@ def admin_login(request):
     '''
     管理员登录
     '''
-
-    # 在测试运行前使用 parametrize 传递参数
+    # 在测试运行前,使用 parametrize 传递参数,更新默认参数
     # 参考 test_tenant.py -> TestTenant
-    psw = request.param
+    payload = {'password': admin_password}
+    update(payload, request)
 
     rq = RQ(base_url=url)
     rq.http(
         'get',
         '/apis/rudder/v1/oauth2/admin',
-        params={'password': admin_password}
+        params=payload
     ).expect(200)
 
     access_token = rq.jq('data.access_token')

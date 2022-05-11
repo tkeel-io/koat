@@ -5,7 +5,7 @@ import uuid
 import pytest
 
 
-@pytest.mark.parametrize("admin_login", ['Y2hhbmdlbWU='], indirect=True)
+# @pytest.mark.parametrize("admin_login", [{'password': 'nothings'}], indirect=True)
 @pytest.mark.usefixtures("create_tenant")
 class TestTenant():
 
