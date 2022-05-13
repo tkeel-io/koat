@@ -5,7 +5,7 @@ import uuid
 import pytest
 
 
-# @pytest.mark.parametrize("admin_login", [{'password': 'nothings'}], indirect=True)
+# @pytest.mark.parametrize("admin_login", [{'password': 'Y2hhbmdlbWU='}], indirect=True)
 @pytest.mark.usefixtures("create_tenant")
 class TestTenant():
 
@@ -28,14 +28,14 @@ class TestTenant():
         '''
         tenant_id = self.tenant_id
         new_tenant_title = str(uuid.uuid1())[0:8]
-        self.rq.http(
-            'put',
-            f'/apis/security/v1/tenants/{tenant_id}',
-            json={
-                'title': new_tenant_title,
-                'remark': "这是一个修改版"
-            }
-        ).expect(200)
+
+        payload = {
+            'title': new_tenant_title,
+            'remark': "这是一个修改版"
+        }
+        resp = self.bs.put(
+            f'/apis/security/v1/tenants/{tenant_id}', json=payload)
+        assert resp.status_code == 200
 
     @pytest.mark.run(order=2)
     def test_delete_tenant(self):
@@ -43,7 +43,5 @@ class TestTenant():
         删除租户空间
         '''
         tenant_id = self.tenant_id
-        self.rq.http(
-            'delete',
-            f'/apis/security/v1/tenants/{tenant_id}',
-        ).expect(200)
+        resp = self.bs.delete(f'/apis/security/v1/tenants/{tenant_id}')
+        assert resp.status_code == 200
