@@ -4,6 +4,11 @@ keel of auto test
 
 ## usage
 
+依赖
+
+- python3
+- pipenv or pip
+
 install with pipenv
 
 ```python
