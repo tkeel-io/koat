@@ -4,7 +4,27 @@ keel of auto test
 
 ## usage
 
-### 什么是会话对象
+install with pipenv
+
+```python
+git clone git@github.com:tkeel-io/koat.git
+cd koat
+pipenv install
+pipenv run pytest cases/<rudder> -s -v 
+
+```
+
+install with pip
+
+``` shell
+git clone git@github.com:tkeel-io/koat.git
+cd koat
+pip intall -r requirements.txt
+pytest cases/<rudder> -s -v
+
+```
+
+## 什么是会话对象
 
 =============
 
@@ -25,7 +45,7 @@ keel of auto test
 
 [主要接口](https://docs.python-requests.org/zh_CN/latest/api.html#id4)
 
-### 什么是固件
+## 什么是固件
 
 =============
 
@@ -86,7 +106,7 @@ Pytest 使用 ``pytest.fixture()`` 定义固件，下面是最简单的固件，
 > 在复杂的项目中，可以在不同的目录层级定义 ``conftest.py``，其作用域为其所在的目录和子目录。
 >不要自己显式调用 ``conftest.py``，pytest 会自动调用，可以把 conftest 当做插件来理解。
 
-### 什么是参数化
+## 什么是参数化
 
 =============
 
