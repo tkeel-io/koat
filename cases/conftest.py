@@ -2,11 +2,12 @@
 
 
 import pytest
+from requests_toolbelt.sessions import BaseUrlSession
 
 
-from src.core import RQ
-from cases.env import *
-from src.helper import random_string, update
+from cases.env import admin_password, url, tenant_user, tenant_id
+from src.helper import random_string
+from src.helper import search as jq
 
 
 @pytest.fixture()
@@ -16,20 +17,19 @@ def admin_login(request):
     '''
     # 在测试运行前,使用 parametrize 传递参数,更新默认参数
     # 参考 test_tenant.py -> TestTenant
+
     payload = {'password': admin_password}
-    update(payload, request)
+    if hasattr(request, 'name'):
+        payload.update(request.param)
 
-    rq = RQ(base_url=url)
-    rq.http(
-        'get',
-        '/apis/rudder/v1/oauth2/admin',
-        params=payload
-    ).expect(200)
+    bs = BaseUrlSession(base_url=url)
+    resp = bs.get('/apis/rudder/v1/oauth2/admin', params=payload)
+    assert resp.status_code == 200
 
-    access_token = rq.jq('data.access_token')
-    rq.set_headers(authorization=f'Bearer {access_token}')
+    access_token = jq('data.access_token', resp.json())
+    bs.headers.update(authorization=f'Bearer {access_token}')
 
-    request.cls.rq = rq
+    request.cls.bs = bs
 
 
 @pytest.fixture()
@@ -39,22 +39,20 @@ def create_tenant(request, admin_login):
     '''
     tenant_title = random_string()
 
-    request.cls.rq.http(
-        'post',
-        '/apis/security/v1/tenants',
-        json={
-            'title': tenant_title,
-            'auth_type': "internal",
-            'admin': {
-                'username': "admin",
-                'nick_name': "admin"
-            },
-            'remark': ""
-        }
-    ).expect(200)
+    payload = {
+        'title': tenant_title,
+        'auth_type': "internal",
+        'admin': {
+            'username': "admin",
+            'nick_name': "admin"
+        },
+        'remark': ""
+    }
+    resp = request.cls.bs.post('/apis/security/v1/tenants', json=payload)
+    assert resp.status_code == 200
 
-    request.cls.tenant_id = request.cls.rq.jq('data.tenant_id')
-    request.cls.reset_key = request.cls.rq.jq('data.reset_key')
+    request.cls.tenant_id = jq('data.tenant_id', resp.json())
+    request.cls.reset_key = jq('data.reset_key', resp.json())
 
 
 @pytest.fixture()
@@ -64,18 +62,16 @@ def tenant_reset_password(request, create_tenant):
     '''
     reset_key = request.cls.reset_key
 
-    request.cls.rq.http(
-        'post',
-        '/apis/security/v1/oauth/rspwd',
-        json={
-            'reset_key': reset_key,
-            'new_password': "changeme"
-        }
+    payload = {
+        'reset_key': reset_key,
+        'new_password': "changeme"
+    }
 
-    ).expect(200)
+    resp = request.cls.bs.post('/apis/security/v1/oauth/rspwd', json=payload)
+    assert resp.status_code == 200
 
-    request.cls.username = request.cls.rq.jq('data.username')
-    request.cls.tenant_id = request.cls.rq.jq('data.tenant_id')
+    request.cls.username = jq('data.username', resp.json())
+    request.cls.tenant_id = jq('data.tenant_id', resp.json())
 
 
 @pytest.fixture()
@@ -86,16 +82,19 @@ def tenant_login(request, tenant_reset_password):
     # tenant_user = request.cls.username
     # tenant_id = request.cls.tenant_id
 
-    rq = RQ(base_url=url)
-    rq.http(
-        'get',
-        f'/apis/security/v1/oauth/{tenant_id}/token',
-        params={'grant_type': 'password',
-                'username': tenant_user,
-                'password': 'changeme'}
-    ).expect(200)
+    bs = BaseUrlSession(base_url=url)
 
-    access_token = rq.jq('data.access_token')
-    rq.set_headers(authorization=f'Bearer {access_token}')
+    payload = {
+        'grant_type': 'password',
+        'username': tenant_user,
+        'password': 'changeme'
+    }
 
-    request.cls.rq = rq
+    resp = bs.get(f'/apis/security/v1/oauth/{tenant_id}/token', params=payload)
+
+    assert resp.status_code == 200
+
+    access_token = jq('data.access_token', resp.json())
+    bs.headers.update(authorization=f'Bearer {access_token}')
+
+    request.cls.bs = bs
