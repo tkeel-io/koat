@@ -1,6 +1,6 @@
 attrs==21.4.0
 autopep8==1.6.0
-certifi==2021.10.8
+certifi==2022.5.18.1
 charset-normalizer==2.0.12
 idna==3.3
 iniconfig==1.1.1
@@ -9,13 +9,13 @@ packaging==21.3
 pluggy==1.0.0
 py==1.11.0
 pycodestyle==2.8.0
-pyparsing==3.0.8
-pyrsistent==0.18.1
+pyparsing==3.0.9
 pytest==7.1.2
 pytest-ordering==0.6
 pytest-sugar==0.9.4
 requests==2.27.1
 requests-toolbelt==0.9.1
+slack-sdk==3.17.0
 termcolor==1.1.0
 toml==0.10.2
 tomli==2.0.1
