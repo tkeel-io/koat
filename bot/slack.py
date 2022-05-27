@@ -1,13 +1,14 @@
 import os
 from slack_sdk import WebClient
 from slack_sdk.errors import SlackApiError
+from env import bot_token
 
 os.system('pytest cases -s -v > report.log ')
 
 with open('./report.log','r') as f:
     data = f.read()
 
-client = WebClient(token='xoxb-2462288675458-3574563337783-vnxSJ8x4WilO4ujpUZbdVorR')
+client = WebClient(token=bot_token)
 
 try:
     response = client.chat_postMessage(channel='tkeel', text=data)
