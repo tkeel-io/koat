@@ -11,6 +11,7 @@ requests-toolbelt = "*"
 pytest-sugar = "*"
 pytest-ordering = "*"
 jmespath = "==1.0.0"
+slack-sdk = "*"
 
 [dev-packages]
 
@@ -22,3 +23,4 @@ docker = "docker buildx build  -f Dockerfile  --platform linux/amd64 -t mx2542/t
 test = "pytest cases -s -v"
 test-src = "pytest src/test -s"
 env_example = "echo PIPENV_DOTENV_LOCATION=`pwd`/.dev.env"
+slack = "python bot/slack.py"
